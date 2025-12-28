@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Mega-Sena 2025</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --primary: #22c55e;
+    --secondary: #38bdf8;
+    --danger: #f87171;
+    --text: #e5e7eb;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: var(--text);
+}
+
+header {
+    padding: 20px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    animation: fadeIn .6s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card h2 {
+    margin-top: 0;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.lists {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.list span {
+    display: flex;
+    justify-content: space-between;
+    background: #020617;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+}
+
+.top span { border-left: 4px solid var(--primary); }
+.bottom span { border-left: 4px solid var(--danger); }
+
+button {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #020617;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+.palpite {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+</style>
+</head>
+
+<body>
+
+<header>🎯 Dashboard Mega-Sena 2025</header>
+
+<div class="container">
+
+    <!-- Gráfico -->
+    <div class="card">
+        <h2>📊 Frequência das Dezenas</h2>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- Rankings -->
+    <div class="card">
+        <h2>🔥 Top / ❄️ Bottom</h2>
+        <div class="lists">
+            <div class="list top" id="top10"></div>
+            <div class="list bottom" id="bottom10"></div>
+        </div>
+
+        <button onclick="gerarPalpite()">🎲 Gerar Palpite</button>
+        <div class="palpite" id="palpite"></div>
+    </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = "mega_sena_2025";
+
+// Dados simulados (podem vir de Excel ou JSON)
+function gerarDados() {
+    let dados = {};
+    for (let i = 1; i <= 60; i++) {
+        dados[i] = Math.floor(Math.random() * 20) + 1;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    return dados;
+}
+
+const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || gerarDados();
+
+// Ranking
+const ranking = Object.entries(dados)
+    .map(([d,f]) => ({dezena:d, freq:f}))
+    .sort((a,b) => b.freq - a.freq);
+
+const top10 = ranking.slice(0,10);
+const bottom10 = ranking.slice(-10);
+
+// Render listas
+function renderLista(el, lista) {
+    el.innerHTML = lista.map(i =>
+        `<span>${i.dezena.padStart(2,'0')} <strong>${i.freq}</strong></span>`
+    ).join("");
+}
+
+renderLista(document.getElementById("top10"), top10);
+renderLista(document.getElementById("bottom10"), bottom10);
+
+// Gráfico
+new Chart(document.getElementById("chart"), {
+    type: 'bar',
+    data: {
+        labels: ranking.map(i => i.dezena),
+        datasets: [{
+            data: ranking.map(i => i.freq),
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        animation: { duration: 1500 }
+    }
+});
+
+// Palpite aleatório
+function gerarPalpite() {
+    let nums = [];
+    while (nums.length < 6) {
+        let n = Math.floor(Math.random() * 60) + 1;
+        if (!nums.includes(n)) nums.push(n);
+    }
+    nums.sort((a,b)=>a-b);
+    document.getElementById("palpite").innerText =
+        nums.map(n=>n.toString().padStart(2,'0')).join(" - ");
+}
+</script>
+
+</body>
+</html>
