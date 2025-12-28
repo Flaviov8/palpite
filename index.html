@@ -29,12 +29,13 @@ body {
 }
 
 header {
-    padding: 20px;
+    padding: 16px;
     text-align: center;
-    font-size: 26px;
+    font-size: clamp(18px, 4vw, 26px);
     font-weight: bold;
 }
 
+/* ===== Layout ===== */
 .container {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -42,10 +43,11 @@ header {
     padding: 20px;
 }
 
+/* ===== Cards ===== */
 .card {
     background: var(--card);
     border-radius: 16px;
-    padding: 20px;
+    padding: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,.4);
     animation: fadeIn .6s ease;
 }
@@ -57,14 +59,15 @@ header {
 
 .card h2 {
     margin-top: 0;
-    font-size: 20px;
-    margin-bottom: 15px;
+    font-size: clamp(16px, 3vw, 20px);
+    margin-bottom: 12px;
 }
 
+/* ===== Rankings ===== */
 .lists {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 12px;
 }
 
 .list span {
@@ -74,33 +77,66 @@ header {
     padding: 8px 12px;
     border-radius: 10px;
     margin-bottom: 6px;
+    font-size: 14px;
 }
 
 .top span { border-left: 4px solid var(--primary); }
 .bottom span { border-left: 4px solid var(--danger); }
 
+/* ===== Botão ===== */
 button {
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     border-radius: 14px;
     border: none;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: #020617;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     transition: .3s;
+    margin-top: 10px;
 }
 
 button:hover {
     transform: scale(1.05);
 }
 
+/* ===== Palpite ===== */
 .palpite {
-    margin-top: 15px;
+    margin-top: 12px;
     text-align: center;
-    font-size: 22px;
+    font-size: clamp(16px, 4vw, 22px);
     letter-spacing: 2px;
+}
+
+/* ===== Canvas Responsivo ===== */
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .lists {
+        grid-template-columns: 1fr;
+    }
+
+    .list span {
+        font-size: 13px;
+    }
+
+    button {
+        font-size: 15px;
+        padding: 12px;
+    }
 }
 </style>
 </head>
@@ -134,7 +170,7 @@ button:hover {
 <script>
 const STORAGE_KEY = "mega_sena_2025";
 
-// Dados simulados (podem vir de Excel ou JSON)
+// Dados simulados
 function gerarDados() {
     let dados = {};
     for (let i = 1; i <= 60; i++) {
@@ -164,7 +200,7 @@ function renderLista(el, lista) {
 renderLista(document.getElementById("top10"), top10);
 renderLista(document.getElementById("bottom10"), bottom10);
 
-// Gráfico
+// Gráfico responsivo
 new Chart(document.getElementById("chart"), {
     type: 'bar',
     data: {
@@ -174,12 +210,14 @@ new Chart(document.getElementById("chart"), {
         }]
     },
     options: {
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: { legend: { display: false } },
-        animation: { duration: 1500 }
+        animation: { duration: 1200 }
     }
 });
 
-// Palpite aleatório
+// Palpite
 function gerarPalpite() {
     let nums = [];
     while (nums.length < 6) {
